@@ -27,4 +27,8 @@ lazy val root = (project in file("."))
 
       //      Postgres JDBC Driver
       "org.postgresql"                % "postgresql"                % "9.4-1206-jdbc42"
-  ))
+  ),
+    mainClass in (Compile, run) := Some("DINS.TestTask.Main"),
+    mainClass in (assembly) := Some("DINS.TestTask.Main"),
+    assemblyJarName in assembly := "DINSTestTask.jar"
+  )
