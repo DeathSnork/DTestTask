@@ -1,3 +1,4 @@
+
 ThisBuild / scalaVersion := "2.12.8"
 ThisBuild / version := "0.1"
 ThisBuild / organization := "DINS"
@@ -7,6 +8,8 @@ lazy val akkaVersion      = "2.6.4"
 lazy val slickVersion     = "3.2.3"
 
 lazy val root = (project in file("."))
+  .enablePlugins(AssemblyPlugin)
+  .enablePlugins(JavaAppPackaging)
   .settings(
     name := "TestTask",
     libraryDependencies ++= Seq(
