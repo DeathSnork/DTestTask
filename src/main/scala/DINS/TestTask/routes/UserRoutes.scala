@@ -24,7 +24,6 @@ class UserRoutes(service: DBService)(implicit ex: ExecutionContext)
         case Success(id) => getUser(id) ~ deleteUser(id) ~ putUser(id)
         case Failure(_) => complete(HttpResponse(StatusCodes.BadRequest, entity = s"id expected: $idString"))
       }
-
     }
   }
 

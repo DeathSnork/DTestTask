@@ -4,13 +4,12 @@ import java.time.LocalDate
 
 import DINS.TestTask.data.model.{Address, User}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 import scala.util.{Failure, Success}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait InitialData extends DataBaseSchema with DB{ this: DataBaseSchema =>
 
-//  implicit def ex: ExecutionContext
   import driver.api._
 
   def insertInitialData(): Future[Unit] = {

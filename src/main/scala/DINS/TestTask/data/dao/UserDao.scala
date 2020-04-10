@@ -2,12 +2,10 @@ package DINS.TestTask.data.dao
 
 import DINS.TestTask.data.db.DataBaseSchema
 import DINS.TestTask.data.model.{Address, User, UserWithAddress}
-import slick.jdbc.meta.MTable
 import slick.sql.FixedSqlAction
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.util.Success
 
 class UserDao(implicit ex: ExecutionContext) extends DataBaseSchema {
 

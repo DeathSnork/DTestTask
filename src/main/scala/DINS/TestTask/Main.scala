@@ -3,11 +3,9 @@ package DINS.TestTask
 import DINS.TestTask.data.db.{DB, DataBaseSchema, InitialData}
 import DINS.TestTask.server.HttpServer
 import DINS.TestTask.service.{DBService, HttpService}
-import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, Materializer}
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext}
+import scala.concurrent.Await
 
 object Main extends App with  HttpService with HttpServer with DataBaseSchema with InitialData with DB {
 
@@ -16,7 +14,6 @@ object Main extends App with  HttpService with HttpServer with DataBaseSchema wi
   dbService.dropDB()
   dbService.initDB()
 
-//  dbService.createSchemaIfNotExists()
 
   Await.result(insertInitialData(), Duration.Inf)
 

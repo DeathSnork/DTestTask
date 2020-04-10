@@ -1,17 +1,13 @@
 package DINS.TestTask.util
 
-import java.time.{LocalDate, LocalDateTime}
-import java.time.format.DateTimeFormatter
-
+import java.time.LocalDate
 import DINS.TestTask.data.dto.{AddressFromHttp, UserFromHttp, UserToHttp}
 import DINS.TestTask.data.model.{Address, User, UserWithAddress}
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import akka.http.scaladsl.marshalling.{Marshaller, Marshalling}
-import akka.http.scaladsl.unmarshalling.Unmarshaller
-import spray.json.{DefaultJsonProtocol, DeserializationException, JsNumber, JsString, JsValue, JsonFormat, RootJsonFormat}
+
+import spray.json.{DefaultJsonProtocol, DeserializationException, JsString, JsValue, RootJsonFormat}
 
 import scala.util.{Failure, Success, Try}
-import scala.util.Try._
 
 trait JsonProtocol extends SprayJsonSupport with DefaultJsonProtocol {
   implicit object LocalDateJsonFormat extends RootJsonFormat[LocalDate] {
