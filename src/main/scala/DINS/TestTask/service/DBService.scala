@@ -22,7 +22,7 @@ class DBService(implicit ex: ExecutionContext) extends DataBaseSchema with DB { 
     db.run(MTable.getTables("ADDRESSES")).flatMap {
       case tables  =>
         println("Schema already exists" + tables)
-        db.run((mainSchema.create)).andThen {
+        db.run(mainSchema.create).andThen {
           case Success(_) => println("addresses Schema created")
         }
 
@@ -57,7 +57,7 @@ class DBService(implicit ex: ExecutionContext) extends DataBaseSchema with DB { 
   def updateUserById(id: Long, userFromHttp: UserFromHttp): Option[UserToHttp] = {
     val addressQuery = Await.result(db.run(users.filter(_.id === id).map(_.addressId).result.headOption), Duration.Inf).flatten
     addressQuery match {
-      case Some(addressId) => {
+      case Some(addressId) =>
         val newAddress = userFromHttp.address.copy(id = Some(addressId))
         val newUser = userFromHttp.toUser.copy(id = Some(id), addressId = Some(addressId))
         val newUserWithAddress = UserWithAddress(newUser, newAddress)
@@ -70,7 +70,6 @@ class DBService(implicit ex: ExecutionContext) extends DataBaseSchema with DB { 
 
         if (result) Some(UserToHttp(newUserWithAddress))
         else None
-      }
       case None => None
     }
   }
@@ -78,12 +77,11 @@ class DBService(implicit ex: ExecutionContext) extends DataBaseSchema with DB { 
   def deleteUserById(id: Long): Boolean = {
     val addressQuery = Await.result(db.run(users.filter(_.id === id).map(_.addressId).result.headOption), Duration.Inf).flatten
     addressQuery match {
-      case Some(addressId) => {
+      case Some(addressId) =>
         val deleteAddressAction = userDao.deleteAddressByIdAction(addressId)
         val deleteUserAction = userDao.deleteUserByIdAction(id)
         Await.result(db.run(deleteAddressAction.andThen(deleteUserAction)), waitTime)
         true
-      }
       case None => false
     }
   }

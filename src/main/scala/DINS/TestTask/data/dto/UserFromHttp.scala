@@ -9,10 +9,10 @@ case class UserFromHttp(firstName: String,
                         DOB: LocalDate,
                         address: Address) {
 
-  def toUser = User(None, firstName, lastName, DOB, None)
+  def toUser: User = User(None, firstName, lastName, DOB, None)
 
-  def toUser(addressId: Long) = User(None, firstName, lastName, DOB, Some(addressId))
+  def toUser(addressId: Long): User = User(None, firstName, lastName, DOB, Some(addressId))
 
-  def toUserWithAddress = UserWithAddress(this.toUser, address)
+  def toUserWithAddress: UserWithAddress = UserWithAddress(this.toUser, address)
 
 }

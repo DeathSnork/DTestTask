@@ -9,12 +9,10 @@ import scala.concurrent.Await
 
 object Main extends App with  HttpService with HttpServer with DataBaseSchema with InitialData with DB {
 
-  implicit lazy val dbService = new DBService
+  implicit lazy val dbService: DBService = new DBService
 
   dbService.dropDB()
   dbService.initDB()
 
-
   Await.result(insertInitialData(), Duration.Inf)
-
 }

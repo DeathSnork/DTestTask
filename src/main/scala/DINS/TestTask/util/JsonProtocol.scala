@@ -11,18 +11,17 @@ import scala.util.{Failure, Success, Try}
 
 trait JsonProtocol extends SprayJsonSupport with DefaultJsonProtocol {
   implicit object LocalDateJsonFormat extends RootJsonFormat[LocalDate] {
-    def write(localDate: LocalDate) = JsString(localDate.toString)
+    def write(localDate: LocalDate): JsString = JsString(localDate.toString)
 
     def read(value: JsValue): LocalDate = value match {
-      case JsString(string: String) => {
+      case JsString(string: String) =>
         Try {
           val arr = string.split("-").map(_.toInt)
           LocalDate.of(arr(0), arr(1), arr(2))
         } match {
           case Success(value) => value
-          case Failure(e) => throw DeserializationException("Date expected in format: yyyy-mm-dd")
+          case Failure(_) => throw DeserializationException("Date expected in format: yyyy-mm-dd")
         }
-      }
       case _ => throw DeserializationException("Date expected in format: yyyy-mm-dd")
     }
   }

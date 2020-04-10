@@ -34,9 +34,9 @@ class UserRoutes(service: DBService)(implicit ex: ExecutionContext)
 
   // CREATE NEW
   def createUser(): Route = post {
-    entity(as[UserFromHttp]) { userDto =>
+    entity(as[UserFromHttp]) { userFromHttp =>
       complete {
-        (StatusCodes.Created, service.insertUser(userDto))
+        (StatusCodes.Created, service.insertUser(userFromHttp))
       }
     }
   }
