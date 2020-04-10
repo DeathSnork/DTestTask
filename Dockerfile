@@ -1,5 +1,13 @@
-FROM openjdk:8-jre-alpine
+FROM amazonlinux:2017.03
 
-ADD target/scala-2.12/DINSTestTask.jar app.jar
+#ENV SCALA_VERSION 2.11.8
+#ENV SBT_VERSION 0.13.13
 
-ENTRYPOINT ["java","-jar","/app.jar"]
+# Install Java8
+RUN yum install -y java-1.8.0-openjdk-devel
+
+
+RUN mkdir -p /opt/app
+WORKDIR /opt/app
+COPY ./run_jar.sh ./DINSTestTask.jar ./
+ENTRYPOINT ["./run_jar.sh"]
