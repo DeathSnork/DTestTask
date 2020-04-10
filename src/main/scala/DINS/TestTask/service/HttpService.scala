@@ -1,7 +1,5 @@
 package DINS.TestTask.service
 
-import DINS.TestTask.Main.dbService
-import DINS.TestTask.data.db.DB
 import DINS.TestTask.routes.UserRoutes
 import akka.actor.ActorSystem
 import akka.http.scaladsl.server.Route

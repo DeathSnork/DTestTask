@@ -1,5 +1,6 @@
 package DINS.TestTask.server
 
+import DINS.TestTask.config.Config
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Route
@@ -7,7 +8,7 @@ import akka.stream.Materializer
 
 import scala.concurrent.ExecutionContext
 
-trait HttpServer {
+trait HttpServer extends Config{
   implicit def system: ActorSystem
 
   implicit def materializer: Materializer
@@ -16,5 +17,5 @@ trait HttpServer {
 
   def routes: Route
 
-  Http().bindAndHandle(routes, "localhost", 8080)
+  Http().bindAndHandle(routes, httpHost, httpPort)
 }

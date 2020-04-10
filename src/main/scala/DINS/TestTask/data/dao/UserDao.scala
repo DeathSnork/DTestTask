@@ -13,22 +13,22 @@ class UserDao(implicit ex: ExecutionContext) extends DataBaseSchema {
 
   def AddressSchemaCreation(): FixedSqlAction[Unit, NoStream, Effect.Schema] = addresses.schema.create
   def AddressSchemaDeletion(): FixedSqlAction[Unit, NoStream, Effect.Schema] = addresses.schema.drop
-  def UserSchemaCreation(): FixedSqlAction[Unit, NoStream, Effect.Schema] = users.schema.create
-  def UserSchemaDeletion(): FixedSqlAction[Unit, NoStream, Effect.Schema] = users.schema.drop
+  def UserSchemaCreation():    FixedSqlAction[Unit, NoStream, Effect.Schema] = users.schema.create
+  def UserSchemaDeletion():    FixedSqlAction[Unit, NoStream, Effect.Schema] = users.schema.drop
 
-  def initUsers: Future[Unit] = db.run(users.schema.create)
-  def dropUsers: Future[Unit] = db.run(users.schema.drop)
-  def initAddresses: Future[Unit] = db.run(addresses.schema.create)
-  def dropAddresses: Future[Unit] = db.run(addresses.schema.drop)
+  def initUsers: Future[Unit]     = db.run(UserSchemaCreation())
+  def dropUsers: Future[Unit]     = db.run(UserSchemaDeletion())
+  def initAddresses: Future[Unit] = db.run(AddressSchemaCreation())
+  def dropAddresses: Future[Unit] = db.run(AddressSchemaDeletion())
 
   def initDB(): Unit = {
-    Await.result(db.run(addresses.schema.create), Duration.Inf)
-    Await.result(db.run(users.schema.create), Duration.Inf)
+    Await.result(initAddresses, Duration.Inf)
+    Await.result(initUsers, Duration.Inf)
   }
 
   def dropDB(): Unit = {
-    Await.result(db.run(users.schema.drop), Duration.Inf)
-    Await.result(db.run(addresses.schema.drop), Duration.Inf)
+    Await.result(dropUsers, Duration.Inf)
+    Await.result(dropAddresses, Duration.Inf)
   }
 
   private def addAddressAction(address: Address): DBIO[Address] = {

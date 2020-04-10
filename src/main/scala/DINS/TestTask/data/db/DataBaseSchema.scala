@@ -7,6 +7,9 @@ import slick.ast.BaseTypedType
 import slick.jdbc.JdbcType
 import slick.lifted.{ForeignKeyQuery, ProvenShape}
 
+/**
+ * Schemas definition for User and Address
+ */
 trait DataBaseSchema extends DB { this: DB =>
 
   import driver.api._
@@ -26,6 +29,9 @@ trait DataBaseSchema extends DB { this: DB =>
   val addresses = TableQuery[Addresses]
 
   class Users(tag: Tag) extends Table[User](tag, "USERS") {
+    /**
+     * LocalDate Converter for DOB column
+     */
     implicit val LocalDateFormatter: JdbcType[LocalDate] with BaseTypedType[LocalDate] =
       MappedColumnType.base[LocalDate, String](
       localDate => localDate.toString,
