@@ -1,4 +1,4 @@
-package DINS.TestTask.data.persistance
+package DINS.TestTask.data.db
 
 import slick.jdbc.JdbcProfile
 

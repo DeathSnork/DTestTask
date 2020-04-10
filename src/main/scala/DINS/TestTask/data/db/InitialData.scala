@@ -3,7 +3,6 @@ package DINS.TestTask.data.db
 import java.time.LocalDate
 
 import DINS.TestTask.data.model.{Address, User}
-import DINS.TestTask.data.persistance.DB
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}

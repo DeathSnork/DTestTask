@@ -1,34 +1,33 @@
 package DINS.TestTask.data.db
 
-
+import DINS.TestTask.data.model.{Address, User}
 import java.time.LocalDate
 
-import DINS.TestTask.data.model.{Address, User}
-import DINS.TestTask.data.persistance.DB
-
-
-//import slick.jdbc.PostgresProfile.api._
+import slick.ast.BaseTypedType
+import slick.jdbc.JdbcType
+import slick.lifted.{ForeignKeyQuery, ProvenShape}
 
 trait DataBaseSchema extends DB { this: DB =>
 
   import driver.api._
 
   class Addresses(tag: Tag) extends Table[Address](tag, "ADDRESSES") {
-    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
-    def street = column[String]("STREET")
-    def city = column[String]("CITY")
-    def stateOrProvince = column[String]("STATE_OR_PROVINCE")
-    def postalCode = column[String]("POSTAL_CODE")
-    def country = column[String]("COUNTRY")
+    def id:               Rep[Long]   = column[Long]("id", O.PrimaryKey, O.AutoInc)
+    def street:           Rep[String] = column[String]("STREET")
+    def city:             Rep[String] = column[String]("CITY")
+    def stateOrProvince:  Rep[String] = column[String]("STATE_OR_PROVINCE")
+    def postalCode:       Rep[String] = column[String]("POSTAL_CODE")
+    def country:          Rep[String] = column[String]("COUNTRY")
 
-    def * =
+    override def * : ProvenShape[Address] =
       (id.?, street, city, stateOrProvince, postalCode, country) <> (Address.tupled, Address.unapply)
   }
 
   val addresses = TableQuery[Addresses]
 
   class Users(tag: Tag) extends Table[User](tag, "USERS") {
-    implicit val LocalDateFormatter = MappedColumnType.base[LocalDate, String](
+    implicit val LocalDateFormatter: JdbcType[LocalDate] with BaseTypedType[LocalDate] =
+      MappedColumnType.base[LocalDate, String](
       localDate => localDate.toString,
       string    => {
         val arr = string.split("-").map(_.toInt)
@@ -36,19 +35,21 @@ trait DataBaseSchema extends DB { this: DB =>
       }
     )
 
-    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
-    def firstName = column[String]("FIRST_NAME")
-    def lastName = column[String]("LAST_NAME")
-    def DOB = column[LocalDate]("DOB")
-    def addressId = column[Option[Long]]("ADDRESS_ID")
+    def id:         Rep[Long]         = column[Long]("id", O.PrimaryKey, O.AutoInc)
+    def firstName:  Rep[String]       = column[String]("FIRST_NAME")
+    def lastName:   Rep[String]       = column[String]("LAST_NAME")
+    def DOB:        Rep[LocalDate]    = column[LocalDate]("DOB")
+    def addressId:  Rep[Option[Long]] = column[Option[Long]]("ADDRESS_ID")
 
-    def * =
+    override def * : ProvenShape[User] =
       (id.?, firstName, lastName, DOB, addressId) <> (User.tupled, User.unapply)
 
-    def address =
+    def address: ForeignKeyQuery[Addresses, Address] =
       foreignKey("ADDRESS_FK", addressId, addresses)(_.id, onUpdate=ForeignKeyAction.Restrict, onDelete=ForeignKeyAction.Cascade)
   }
 
   val users = TableQuery[Users]
+
+  val mainSchema: driver.DDL = addresses.schema ++ users.schema
 
 }

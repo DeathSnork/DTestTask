@@ -1,13 +1,13 @@
-package DINS.TestTask.data.db
+package DINS.TestTask.data.dao
 
+import DINS.TestTask.data.db.DataBaseSchema
 import DINS.TestTask.data.model.{Address, User, UserWithAddress}
 import slick.jdbc.meta.MTable
 import slick.sql.FixedSqlAction
 
+import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.Success
-
-import scala.concurrent.duration.Duration
 
 class UserDao(implicit ex: ExecutionContext) extends DataBaseSchema {
 
@@ -17,7 +17,7 @@ class UserDao(implicit ex: ExecutionContext) extends DataBaseSchema {
     db.run(MTable.getTables("ADDRESSES")).flatMap {
       case tables  =>
         println("Schema already exists" + tables)
-        db.run((addresses.schema.create)).andThen {
+        db.run((mainSchema.create)).andThen {
           case Success(_) => println("addresses Schema created")
         }
 
@@ -26,8 +26,6 @@ class UserDao(implicit ex: ExecutionContext) extends DataBaseSchema {
         Future.successful()
     }
   }
-
-  private val mainSchema = addresses.schema ++ users.schema
 
   def AddressSchemaCreation(): FixedSqlAction[Unit, NoStream, Effect.Schema] = addresses.schema.create
   def AddressSchemaDeletion(): FixedSqlAction[Unit, NoStream, Effect.Schema] = addresses.schema.drop
@@ -49,7 +47,7 @@ class UserDao(implicit ex: ExecutionContext) extends DataBaseSchema {
     Await.result(db.run(addresses.schema.drop), Duration.Inf)
   }
 
-  def addAddressAction(address: Address): DBIO[Address] = {
+  private def addAddressAction(address: Address): DBIO[Address] = {
     addresses returning addresses.map(_.id) into ((address, id) => address.copy(id = Some(id))) += address
   }
 
@@ -57,8 +55,12 @@ class UserDao(implicit ex: ExecutionContext) extends DataBaseSchema {
     addresses.filter(_.id === id).update(address)
   }
 
-  def addUserAction(user: User): DBIO[User] = {
+  private def addUserAction(user: User): DBIO[User] = {
     users returning users.map(_.id) into ((user, id) => user.copy(id = Some(id))) += user
+  }
+
+  def updateUserByIdAction(id: Long, user: User): DBIO[Int] = {
+    users.filter(_.id === id).update(user)
   }
 
   def getAllUsers: Future[Seq[User]] = {
@@ -71,30 +73,21 @@ class UserDao(implicit ex: ExecutionContext) extends DataBaseSchema {
     db.run(query)
   }
 
-  def updateUserByIdAction(id: Long, user: User): DBIO[Int] = {
-    users.filter(_.id === id).update(user)
+  def deleteUserByIdAction(id: Long): DBIO[Boolean] = {
+    users.filter(_.id === id).delete.map(_ > 0)
   }
 
-  def deleteUserById(id: Long): Future[Boolean] = {
-    val query = users.filter(_.id === id).delete.map(_ > 0)
-    db.run(query)
+  def deleteAddressByIdAction(addressId: Long): DBIO[Boolean] = {
+    addresses.filter(_.id === addressId).delete.map(_ > 0)
   }
 
   def addUserWithAddress(userWithAddress: UserWithAddress): Future[UserWithAddress] = {
-    val addressWithId = addAddressAction(userWithAddress.address)
-    val userWithId = addUserAction(userWithAddress.user)
-    val action = (addressWithId.zip(userWithId)).transactionally
-    db.run(action).map(_.swap).map(UserWithAddress.tupled)
-  }
-
-  def addUserWithAddress2(userWithAddress: UserWithAddress): Future[UserWithAddress] = {
     val user = userWithAddress.user
     val address = userWithAddress.address
 
-    val insertAddress = addresses returning addresses.map(_.id)
     val query = for {
-        addressId <- insertAddress += address
-        userId <- users returning users.map(_.id) += user.copy(addressId = Some(addressId))
+        addressId <- addresses returning addresses.map(_.id) += address
+        userId    <- users     returning users.map(_.id)     += user.copy(addressId = Some(addressId))
     } yield UserWithAddress(user.copy(id = Some(userId)), address.copy(id = Some(addressId)))
     query.transactionally
     db.run(query)

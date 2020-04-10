@@ -1,18 +1,12 @@
 package DINS.TestTask.service
 
-import DINS.TestTask.data.db.{DataBaseSchema, UserDao}
-import DINS.TestTask.data.dto.{UserDto, UserDtoWithId}
+import DINS.TestTask.data.dao.UserDao
+import DINS.TestTask.data.db.{DB, DataBaseSchema}
+import DINS.TestTask.data.dto.{UserFromHttp, UserToHttp}
 import DINS.TestTask.data.model.UserWithAddress
-import DINS.TestTask.data.persistance.DB
-import DINS.TestTask.routes.UserRoutes
-import akka.actor.ActorSystem
-import akka.http.scaladsl.server.Route
-import akka.stream.{ActorMaterializer, Materializer}
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
-
-//import slick.jdbc.PostgresProfile.api._
+import scala.concurrent.{Await, ExecutionContext}
 
 class DBService(implicit ex: ExecutionContext) extends DataBaseSchema with DB { this: DB =>
 
@@ -26,30 +20,55 @@ class DBService(implicit ex: ExecutionContext) extends DataBaseSchema with DB { 
 
   def dropDB(): Unit = userDao.dropDB()
 
-  def allUsers: Seq[UserDtoWithId] = {
+  def allUsers: Seq[UserToHttp] = {
     val result = Await.result(userDao.getAllUsersWithAddress, waitTime)
-    result.map(UserDtoWithId(_))
+    result.map(UserToHttp(_))
   }
 
-  def insertUser(userDto: UserDto): UserDtoWithId = {
-    val result = Await.result(userDao.addUserWithAddress2(userDto.toUserWithAddress), waitTime)
-    UserDtoWithId(result)
+  def insertUser(userDto: UserFromHttp): UserToHttp = {
+    val result = Await.result(userDao.addUserWithAddress(userDto.toUserWithAddress), waitTime)
+    UserToHttp(result)
   }
 
-  def getUserById(id: Long): Option[UserDtoWithId] = {
+  def getUserById(id: Long): Option[UserToHttp] = {
     val result = Await.result(userDao.getUserWithAddressById(id), waitTime)
     result match {
-      case Some(x) => Some(UserDtoWithId(x))
+      case Some(x) => Some(UserToHttp(x))
+      case None => None
+    }
+  }
+
+  def updateUserById(id: Long, userFromHttp: UserFromHttp): Option[UserToHttp] = {
+    val addressQuery = Await.result(db.run(users.filter(_.id === id).map(_.addressId).result.headOption), Duration.Inf).get
+    addressQuery match {
+      case Some(addressId) => {
+        val newAddress = userFromHttp.address.copy(id = Some(addressId))
+        val newUser = userFromHttp.toUser.copy(id = Some(id), addressId = Some(addressId))
+        val newUserWithAddress = UserWithAddress(newUser, newAddress)
+
+        val updateAddressAction = userDao.updateAddressByIdAction(addressId, newAddress)
+        val updateUserAction = userDao.updateUserByIdAction(id, newUser)
+        val zipAction = updateAddressAction.zip(updateUserAction)
+
+        val result = Await.result(db.run(zipAction.map(res => res._1 > 0 && res._2 > 0).transactionally), waitTime)
+
+        if (result) Some(UserToHttp(newUserWithAddress))
+        else None
+      }
       case None => None
     }
   }
 
   def deleteUserById(id: Long): Boolean = {
-    val result = Await.result(userDao.deleteUserById(id), waitTime)
-    result
-  }
-
-  def updateUserById(id: Long, userDto: UserDto) : Option[UserWithAddress] = {
-    None
+    val addressQuery = Await.result(db.run(users.filter(_.id === id).map(_.addressId).result.headOption), Duration.Inf).get
+    addressQuery match {
+      case Some(addressId) => {
+        val deleteAddressAction = userDao.deleteAddressByIdAction(addressId)
+        val deleteUserAction = userDao.deleteUserByIdAction(id)
+        Await.result(db.run(deleteAddressAction.andThen(deleteUserAction)), waitTime)
+        true
+      }
+      case None => false
+    }
   }
 }

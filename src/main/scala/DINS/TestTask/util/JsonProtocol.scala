@@ -3,7 +3,7 @@ package DINS.TestTask.util
 import java.time.{LocalDate, LocalDateTime}
 import java.time.format.DateTimeFormatter
 
-import DINS.TestTask.data.dto.{AddressDto, UserDto, UserDtoWithId}
+import DINS.TestTask.data.dto.{AddressFromHttp, UserFromHttp, UserToHttp}
 import DINS.TestTask.data.model.{Address, User, UserWithAddress}
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.marshalling.{Marshaller, Marshalling}
@@ -34,13 +34,13 @@ trait JsonProtocol extends SprayJsonSupport with DefaultJsonProtocol {
 
 
   implicit val addressFormat: RootJsonFormat[Address] = jsonFormat6(Address)
-  implicit val addressDtoFormat: RootJsonFormat[AddressDto] = jsonFormat5(AddressDto)
+  implicit val addressDtoFormat: RootJsonFormat[AddressFromHttp] = jsonFormat5(AddressFromHttp)
 
 
   implicit val userFormat: RootJsonFormat[User] = jsonFormat5(User)
-  implicit val userDtoFormat: RootJsonFormat[UserDto] = jsonFormat4(UserDto)
+  implicit val userDtoFormat: RootJsonFormat[UserFromHttp] = jsonFormat4(UserFromHttp)
 
-  implicit val userDtoWithIdFormat: RootJsonFormat[UserDtoWithId] = jsonFormat5(UserDtoWithId.tupled)
+  implicit val userDtoWithIdFormat: RootJsonFormat[UserToHttp] = jsonFormat5(UserToHttp.tupled)
 
   implicit val userWithAddressFormat: RootJsonFormat[UserWithAddress] = jsonFormat2(UserWithAddress)
 }

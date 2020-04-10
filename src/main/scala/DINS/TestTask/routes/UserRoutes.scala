@@ -1,61 +1,76 @@
 package DINS.TestTask.routes
 
-import DINS.TestTask.data.db.UserDao
-import DINS.TestTask.data.dto.UserDto
+
+import DINS.TestTask.data.dto.UserFromHttp
 import DINS.TestTask.service.DBService
 import DINS.TestTask.util.JsonProtocol
 import akka.http.scaladsl.marshalling.ToResponseMarshallable
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
-import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Directives.{entity, _}
 import akka.http.scaladsl.server.Route
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext}
+import scala.concurrent.ExecutionContext
+import scala.util.{Failure, Success, Try}
 
 class UserRoutes(service: DBService)(implicit ex: ExecutionContext)
   extends JsonProtocol {
 
   val routes: Route = pathPrefix("users") {
     pathEndOrSingleSlash {
-      get { // GET ALL
-        complete(ToResponseMarshallable(service.allUsers))
-      } ~
-        post { // CREATE NEW
-          entity(as[UserDto]) { userDto =>
-            complete {
-              (StatusCodes.Created, service.insertUser(userDto))
-            }
-          }
-        }
+      getAllUsers ~ createUser()
     } ~
-      path(Segment) { id =>
-        get { // GET BY ID
-          complete {
-            val result = service.getUserById(id.toLong)
-            result match {
-              case Some(user) => (StatusCodes.OK, user)
-              case None => HttpResponse(StatusCodes.NotFound, entity = s"does not exist users with the id: $id")
-            }
-          }
-        } ~
-          delete { // DELETE BY ID
-            complete {
-              val result = service.deleteUserById(id.toLong)
-              if (result) StatusCodes.OK
-              else HttpResponse(StatusCodes.NotFound, entity = s"does not exist users with the id: $id")
-            }
-          } ~
-          put { // UPDATE BY ID
-            entity(as[UserDto]) { userDto: UserDto =>
-              complete {
-                val result = service.updateUserById(id.toLong, userDto)
-                result match {
-                  case Some(user) => (StatusCodes.OK, user)
-                  case None =>HttpResponse (StatusCodes.NotFound, entity = s"does not exist users with the id: $id")
-                }
-              }
-            }
-          }
+    path(Segment) { idString =>
+      Try(idString.toLong) match {
+        case Success(id) => getUser(id) ~ deleteUser(id) ~ putUser(id)
+        case Failure(_) => complete(HttpResponse(StatusCodes.BadRequest, entity = s"id expected: $idString"))
       }
+
+    }
+  }
+
+  // GET ALL
+  def getAllUsers: Route = get {
+    complete(ToResponseMarshallable(service.allUsers))
+  }
+
+  // CREATE NEW
+  def createUser(): Route = post {
+    entity(as[UserFromHttp]) { userDto =>
+      complete {
+        (StatusCodes.Created, service.insertUser(userDto))
+      }
+    }
+  }
+
+  // GET BY ID
+  def getUser(id: Long): Route = get {
+    complete {
+      val result = service.getUserById(id.toLong)
+      result match {
+        case Some(user) => (StatusCodes.OK, user)
+        case None       => HttpResponse(StatusCodes.NotFound, entity = s"does not exist users with the id: $id")
+      }
+    }
+  }
+
+  // DELETE BY ID
+  def deleteUser(id: Long): Route = delete {
+    complete {
+      val result = service.deleteUserById(id.toLong)
+      if (result) StatusCodes.OK
+      else HttpResponse(StatusCodes.NotFound, entity = s"does not exist users with the id: $id")
+    }
+  }
+  // UPDATE BY ID
+  def putUser(id: Long): Route = put {
+    entity(as[UserFromHttp]) { userFromHttp: UserFromHttp =>
+      complete {
+        val result = service.updateUserById(id.toLong, userFromHttp)
+        result match {
+          case Some(user) => (StatusCodes.OK, user)
+          case None       => HttpResponse (StatusCodes.NotFound, entity = s"does not exist users with the id: $id")
+        }
+      }
+    }
   }
 }
