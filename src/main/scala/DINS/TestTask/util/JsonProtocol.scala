@@ -10,6 +10,9 @@ import spray.json.{DefaultJsonProtocol, DeserializationException, JsString, JsVa
 import scala.util.{Failure, Success, Try}
 
 trait JsonProtocol extends SprayJsonSupport with DefaultJsonProtocol {
+  /**
+   * Json Converter for LocalDate
+   */
   implicit object LocalDateJsonFormat extends RootJsonFormat[LocalDate] {
     def write(localDate: LocalDate): JsString = JsString(localDate.toString)
 
