@@ -13,20 +13,6 @@ class UserDao(implicit ex: ExecutionContext) extends DataBaseSchema {
 
   import driver.api._
 
-  def createSchemaIfNotExists(): Future[Unit] = {
-    db.run(MTable.getTables("ADDRESSES")).flatMap {
-      case tables  =>
-        println("Schema already exists" + tables)
-        db.run((mainSchema.create)).andThen {
-          case Success(_) => println("addresses Schema created")
-        }
-
-      case tables if tables.nonEmpty =>
-        println("Schema already exists" + tables)
-        Future.successful()
-    }
-  }
-
   def AddressSchemaCreation(): FixedSqlAction[Unit, NoStream, Effect.Schema] = addresses.schema.create
   def AddressSchemaDeletion(): FixedSqlAction[Unit, NoStream, Effect.Schema] = addresses.schema.drop
   def UserSchemaCreation(): FixedSqlAction[Unit, NoStream, Effect.Schema] = users.schema.create

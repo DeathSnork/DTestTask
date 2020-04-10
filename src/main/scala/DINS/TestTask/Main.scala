@@ -16,6 +16,8 @@ object Main extends App with  HttpService with HttpServer with DataBaseSchema wi
   dbService.dropDB()
   dbService.initDB()
 
+//  dbService.createSchemaIfNotExists()
+
   Await.result(insertInitialData(), Duration.Inf)
 
 }

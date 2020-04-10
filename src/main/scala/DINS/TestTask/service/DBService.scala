@@ -4,9 +4,11 @@ import DINS.TestTask.data.dao.UserDao
 import DINS.TestTask.data.db.{DB, DataBaseSchema}
 import DINS.TestTask.data.dto.{UserFromHttp, UserToHttp}
 import DINS.TestTask.data.model.UserWithAddress
+import slick.jdbc.meta.MTable
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext}
+import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.util.Success
 
 class DBService(implicit ex: ExecutionContext) extends DataBaseSchema with DB { this: DB =>
 
@@ -15,6 +17,20 @@ class DBService(implicit ex: ExecutionContext) extends DataBaseSchema with DB { 
   private val waitTime = Duration.Inf
 
   lazy val userDao: UserDao = new UserDao
+
+  def createSchemaIfNotExists(): Future[Unit] = {
+    db.run(MTable.getTables("ADDRESSES")).flatMap {
+      case tables  =>
+        println("Schema already exists" + tables)
+        db.run((mainSchema.create)).andThen {
+          case Success(_) => println("addresses Schema created")
+        }
+
+      case tables if tables.nonEmpty =>
+        println("Schema already exists" + tables)
+        Future.successful()
+    }
+  }
 
   def initDB(): Unit = userDao.initDB()
 
@@ -39,7 +55,7 @@ class DBService(implicit ex: ExecutionContext) extends DataBaseSchema with DB { 
   }
 
   def updateUserById(id: Long, userFromHttp: UserFromHttp): Option[UserToHttp] = {
-    val addressQuery = Await.result(db.run(users.filter(_.id === id).map(_.addressId).result.headOption), Duration.Inf).get
+    val addressQuery = Await.result(db.run(users.filter(_.id === id).map(_.addressId).result.headOption), Duration.Inf).flatten
     addressQuery match {
       case Some(addressId) => {
         val newAddress = userFromHttp.address.copy(id = Some(addressId))
@@ -60,7 +76,7 @@ class DBService(implicit ex: ExecutionContext) extends DataBaseSchema with DB { 
   }
 
   def deleteUserById(id: Long): Boolean = {
-    val addressQuery = Await.result(db.run(users.filter(_.id === id).map(_.addressId).result.headOption), Duration.Inf).get
+    val addressQuery = Await.result(db.run(users.filter(_.id === id).map(_.addressId).result.headOption), Duration.Inf).flatten
     addressQuery match {
       case Some(addressId) => {
         val deleteAddressAction = userDao.deleteAddressByIdAction(addressId)
