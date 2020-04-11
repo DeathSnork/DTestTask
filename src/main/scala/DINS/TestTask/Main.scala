@@ -18,9 +18,9 @@ object Main extends App with  HttpService with HttpServer with DataBaseSchema wi
   /**
    * Create DB Tables
    */
-//  dbService.dropDB()
-  ////  dbService.initDB()
-  dbService.createTablesIfNotExist()
+  dbService.dropDB()
+  dbService.initDB()
+//  dbService.createTablesIfNotExist()
 
 
   /**
