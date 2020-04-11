@@ -8,5 +8,5 @@ RUN mkdir -p /opt/app
 WORKDIR /opt/app
 COPY  ./target/scala-2.12/DINSTestTask.jar ./run_jar.sh ./
 RUN ["chmod", "+x", "/opt/app/run_jar.sh"]
-RUN ["chmod", "+x", "/opt/app/DINSTestTask.jar"]
+#RUN ["chmod", "+x", "/opt/app/DINSTestTask.jar"]
 ENTRYPOINT ./run_jar.sh
