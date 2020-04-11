@@ -10,7 +10,7 @@ lazy val slickVersion     = "3.2.3"
 lazy val root = (project in file("."))
   .enablePlugins(AssemblyPlugin)
   .enablePlugins(JavaAppPackaging)
-//  .enablePlugins(DockerPlugin)
+  .enablePlugins(DockerPlugin)
   .settings(
     name := "TestTask",
     libraryDependencies ++= Seq(
