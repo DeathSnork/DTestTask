@@ -4,11 +4,9 @@ import DINS.TestTask.data.dao.UserDao
 import DINS.TestTask.data.db.{DB, DataBaseSchema}
 import DINS.TestTask.data.dto.{UserFromHttp, UserToHttp}
 import DINS.TestTask.data.model.UserWithAddress
-import slick.jdbc.meta.MTable
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.util.Success
+import scala.concurrent.{Await, ExecutionContext}
 
 class DBService(implicit ex: ExecutionContext) extends DataBaseSchema with DB { this: DB =>
 
@@ -18,18 +16,8 @@ class DBService(implicit ex: ExecutionContext) extends DataBaseSchema with DB { 
 
   lazy val userDao: UserDao = new UserDao
 
-  def createSchemaIfNotExists(): Future[Unit] = {
-    db.run(MTable.getTables("ADDRESSES")).flatMap {
-      case tables  =>
-        println("Schema already exists" + tables)
-        db.run(mainSchema.create).andThen {
-          case Success(_) => println("addresses Schema created")
-        }
-
-      case tables if tables.nonEmpty =>
-        println("Schema already exists" + tables)
-        Future.successful()
-    }
+  def createTablesIfNotExist(): Unit = {
+    Await.result(userDao.createTablesIfNotExist(), waitTime)
   }
 
   def initDB(): Unit = userDao.initDB()

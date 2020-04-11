@@ -14,7 +14,7 @@ trait DataBaseSchema extends DB { this: DB =>
 
   import driver.api._
 
-  class Addresses(tag: Tag) extends Table[Address](tag, Some("postgres"), "ADDRESSES") {
+  class Addresses(tag: Tag) extends Table[Address](tag, "public.ADDRESSES") {
     def id:               Rep[Long]   = column[Long]("id", O.PrimaryKey, O.AutoInc)
     def street:           Rep[String] = column[String]("STREET")
     def city:             Rep[String] = column[String]("CITY")
@@ -29,7 +29,7 @@ trait DataBaseSchema extends DB { this: DB =>
 
   val addresses = TableQuery[Addresses]
 
-  class Users(tag: Tag) extends Table[User](tag, Some("postgres"), "USERS") {
+  class Users(tag: Tag) extends Table[User](tag, "public.USERS") {
     /**
      * LocalDate Converter for DOB column
      */
@@ -57,6 +57,6 @@ trait DataBaseSchema extends DB { this: DB =>
 
   val users = TableQuery[Users]
 
-  val mainSchema: driver.DDL = addresses.schema ++ users.schema
+  val tables = List(addresses, users)
 
 }
