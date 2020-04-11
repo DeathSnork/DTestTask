@@ -6,5 +6,5 @@ EXPOSE 8080
 
 RUN mkdir -p /opt/app
 WORKDIR /opt/app
-COPY  ./target/scala-2.12/DINSTestTask.jar ./
-ENTRYPOINT ["java -jar DINSTestTask.jar"]
+COPY  ./target/scala-2.12/DINSTestTask.jar ./run_jar.sh ./
+ENTRYPOINT ./run_jar.sh
