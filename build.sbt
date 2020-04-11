@@ -21,6 +21,7 @@ lazy val root = (project in file("."))
       "com.typesafe.akka"             %% "akka-http-spray-json"     % akkaHttpVersion,
       //      Logging
       "ch.qos.logback"                % "logback-classic"           % "1.2.3",
+      "com.typesafe.scala-logging"    %% "scala-logging"            % "3.9.2",
 
       //      Slick
       "com.typesafe.slick"            %% "slick"                    % slickVersion,
