@@ -14,7 +14,7 @@ trait DataBaseSchema extends DB { this: DB =>
 
   import driver.api._
 
-  class Addresses(tag: Tag) extends Table[Address](tag, "ADDRESSES") {
+  class Addresses(tag: Tag) extends Table[Address](tag, Some("public"), "ADDRESSES") {
     def id:               Rep[Long]   = column[Long]("id", O.PrimaryKey, O.AutoInc)
     def street:           Rep[String] = column[String]("STREET")
     def city:             Rep[String] = column[String]("CITY")
@@ -26,9 +26,10 @@ trait DataBaseSchema extends DB { this: DB =>
       (id.?, street, city, stateOrProvince, postalCode, country) <> (Address.tupled, Address.unapply)
   }
 
+
   val addresses = TableQuery[Addresses]
 
-  class Users(tag: Tag) extends Table[User](tag, "USERS") {
+  class Users(tag: Tag) extends Table[User](tag, Some("public"), "USERS") {
     /**
      * LocalDate Converter for DOB column
      */
