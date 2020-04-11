@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-java -jar DINSTestTask.jar.jar
+java -jar ./DINSTestTask.jar.jar
