@@ -16,7 +16,7 @@ object Main extends App with  HttpService with HttpServer with DataBaseSchema wi
   implicit lazy val dbService: DBService = new DBService
 
   /**
-   * Drop and create DB Scheme
+   * Create DB Tables
    */
 //  dbService.dropDB()
   ////  dbService.initDB()
