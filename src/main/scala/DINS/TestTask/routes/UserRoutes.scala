@@ -16,21 +16,21 @@ class UserRoutes(service: DBService)(implicit ex: ExecutionContext)
 
   private val cors = new CORSHandler {}
 
-  val routes: Route = pathPrefix("users") {
+  val routes: Route = cors.corsHandler(pathPrefix("users") {
     pathEndOrSingleSlash {
       getAllUsers ~ createUser()
     } ~
     path(Segment) { idString =>
       Try(idString.toLong) match {
         case Success(id) => getUser(id) ~ deleteUser(id) ~ putUser(id)
-        case Failure(_) => cors.corsHandler(complete(HttpResponse(StatusCodes.BadRequest, entity = s"id expected: $idString")))
+        case Failure(_) => complete(HttpResponse(StatusCodes.BadRequest, entity = s"id expected: $idString"))
       }
     }
-  }
+  })
 
   // GET ALL
   def getAllUsers: Route = get {
-    cors.corsHandler(complete(ToResponseMarshallable(service.allUsers)))
+    complete(ToResponseMarshallable(service.allUsers))
   }
 
   // CREATE NEW
