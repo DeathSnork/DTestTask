@@ -1,0 +1,176 @@
+#Get Users
+    Return JSON array of users
+    ## URL
+        /users/
+    ## Method
+        GET
+    ## URL Params
+        None
+    ## Success Response:
+        [
+            {
+                "DOB": "1992-11-12",
+                "address": {
+                    "city": "NY",
+                    "country": "USA",
+                    "id": 1,
+                    "postalCode": "NY 13777",
+                    "stateOrProvince": "NY",
+                    "street": "25 Guild Street Glen Aubrey"
+                },
+                "firstName": "John",
+                "id": 1,
+                "lastName": "Smith"
+            },
+            {
+                "DOB": "2002-01-03",
+                "address": {
+                    "city": "PORTSMOUTH",
+                    "country": "Hampshire",
+                    "id": 2,
+                    "postalCode": "PO1 1AA",
+                    "stateOrProvince": "Fratton",
+                    "street": "30 Commercial Road"
+                },
+                "firstName": "James",
+                "id": 2,
+                "lastName": "Fitton"
+            }
+        ]
+#Get User
+    Return User as JSON
+    ## URL
+        /users/{id}
+    ## Method
+            GET
+    ## URL Params
+        id = Long
+    ## Success Response:
+        {
+            "DOB": "1992-11-12",
+            "address": {
+                "city": "NY",
+                "country": "USA",
+                "id": 1,
+                "postalCode": "NY 13777",
+                "stateOrProvince": "NY",
+                "street": "25 Guild Street Glen Aubrey"
+            },
+            "firstName": "John",
+            "id": 1,
+            "lastName": "Smith"
+        }
+    ## Error Response:
+        ### Code: 404 NOT FOUND
+        ### Content: does not exist users with the id: {id}
+
+        ### Code: 400 BAD REQUEST
+        ### Content: id expected: {id}
+#Create User
+    Return created User as JSON
+    ## URL
+        /users/
+    ## Method
+            POST
+    ## URL Params
+        None
+    ## Body example
+        {
+            "DOB": "1992-05-12",
+            "address": {
+                "city": "newAddressr",
+                "country": "new",
+                "postalCode": "new",
+                "stateOrProvince": "new",
+                "street": "new"
+            },
+            "firstName": "newUser",
+            "lastName": "new"
+        }
+    ## Success Response:
+        ### Code: 201 CREATED
+        ### Content:
+            {
+                "DOB": "1992-05-12",
+                "address": {
+                    "city": "newAddressr",
+                    "country": "new",
+                    "id": 3,
+                    "postalCode": "new",
+                    "stateOrProvince": "new",
+                    "street": "new"
+                },
+                "firstName": "newUser",
+                "id": 3,
+                "lastName": "new"
+            }
+    ## Error Response:
+            ### Code: 400 BAD REQUEST
+            ### Content: The request content was malformed:
+                         Unexpected end-of-input at input index 256 (line 12, position 1), expected '}':
+
+
+#Update User
+    Return updated User as JSON
+    ## URL
+        /users/{id}
+    ## Method
+            PUT
+    ## URL Params
+        id = Long
+    ## Body example
+        {
+            "DOB": "1992-05-12",
+            "address": {
+                "city": "updatedAddressr",
+                "country": "updated",
+                "postalCode": "updated",
+                "stateOrProvince": "updated",
+                "street": "updated"
+            },
+            "firstName": "updatedUser",
+            "lastName": "updated"
+        }
+    ## Success Response:
+            ### Code: 201 CREATED
+            ### Content:
+                {
+                    "DOB": "1992-05-12",
+                    "address": {
+                        "city": "updatedAddressr",
+                        "country": "updated",
+                        "id": 2,
+                        "postalCode": "updated",
+                        "stateOrProvince": "updated",
+                        "street": "updated"
+                    },
+                    "firstName": "updatedUser",
+                    "id": 2,
+                    "lastName": "updated"
+                }
+    ## Error Response:
+            ### Code: 404 NOT FOUND
+            ### Content: does not exist users with the id: {id}
+
+            ### Code: 400 BAD REQUEST
+            ### Content: id expected: {id}
+
+#Delete User
+    Return 200 OK if user deleted
+    ## URL
+        /users/{id}
+    ## Method
+            DELETE
+    ## URL Params
+        id = Long
+    ## Success Response:
+                ### Code: 200 OK
+     ## Error Response:
+                ### Code: 404 NOT FOUND
+                ### Content: does not exist users with the id: {id}
+
+                ### Code: 400 BAD REQUEST
+                ### Content: id expected: {id}
+
+
+

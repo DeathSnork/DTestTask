@@ -1,8 +1,8 @@
-### Requirements
+## Requirements
     * SBT
     * Java 8+
 
-### Work on
+## Work on
     * SBT 1.3.9
     * Java 11.0.6
     * Docker 19.03.8
@@ -21,6 +21,9 @@
     sbt clean assembly
     docker-compose build --no-cache
     docker-compose up
+
+## Rest api
+    Rest Api methods description in "REST api description.txt"
 
 ## Feedback
     I will be glad to feedback and comments
