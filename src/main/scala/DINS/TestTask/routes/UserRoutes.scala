@@ -34,13 +34,13 @@ class UserRoutes(service: DBService)(implicit ex: ExecutionContext)
   }
 
   // CREATE NEW
-  def createUser(): Route = post {
+  def createUser(): Route = cors.corsHandler(post {
     entity(as[UserFromHttp]) { userFromHttp =>
       complete {
         (StatusCodes.Created, service.insertUser(userFromHttp))
       }
     }
-  }
+  })
 
   // GET BY ID
   def getUser(id: Long): Route = get {
