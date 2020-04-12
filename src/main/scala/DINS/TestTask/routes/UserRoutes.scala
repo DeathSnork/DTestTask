@@ -1,6 +1,5 @@
 package DINS.TestTask.routes
 
-
 import DINS.TestTask.data.dto.UserFromHttp
 import DINS.TestTask.service.DBService
 import DINS.TestTask.util.JsonProtocol
@@ -15,6 +14,8 @@ import scala.util.{Failure, Success, Try}
 class UserRoutes(service: DBService)(implicit ex: ExecutionContext)
   extends JsonProtocol {
 
+  private val cors = new CORSHandler {}
+
   val routes: Route = pathPrefix("users") {
     pathEndOrSingleSlash {
       getAllUsers ~ createUser()
@@ -22,14 +23,14 @@ class UserRoutes(service: DBService)(implicit ex: ExecutionContext)
     path(Segment) { idString =>
       Try(idString.toLong) match {
         case Success(id) => getUser(id) ~ deleteUser(id) ~ putUser(id)
-        case Failure(_) => complete(HttpResponse(StatusCodes.BadRequest, entity = s"id expected: $idString"))
+        case Failure(_) => cors.corsHandler(complete(HttpResponse(StatusCodes.BadRequest, entity = s"id expected: $idString")))
       }
     }
   }
 
   // GET ALL
   def getAllUsers: Route = get {
-    complete(ToResponseMarshallable(service.allUsers))
+    cors.corsHandler(complete(ToResponseMarshallable(service.allUsers)))
   }
 
   // CREATE NEW
