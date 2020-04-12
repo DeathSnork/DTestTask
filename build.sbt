@@ -10,7 +10,6 @@ lazy val slickVersion     = "3.2.3"
 lazy val root = (project in file("."))
   .enablePlugins(AssemblyPlugin)
   .enablePlugins(JavaAppPackaging)
-//  .enablePlugins(DockerPlugin)
   .settings(
     name := "TestTask",
     libraryDependencies ++= Seq(
@@ -30,7 +29,7 @@ lazy val root = (project in file("."))
       "org.postgresql"                % "postgresql"                % "9.4-1206-jdbc42"
   ),
     mainClass in (Compile, run) := Some("DINS.TestTask.Main"),
-    mainClass in (assembly) := Some("DINS.TestTask.Main"),
+    mainClass in assembly := Some("DINS.TestTask.Main"),
     assemblyJarName in assembly := "DINSTestTask.jar",
     assemblyOutputPath in assembly := file("./DINSTestTask.jar")
   )
