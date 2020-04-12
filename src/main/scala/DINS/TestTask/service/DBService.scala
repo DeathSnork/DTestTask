@@ -16,10 +16,6 @@ class DBService(implicit ex: ExecutionContext) extends DataBaseSchema with DB { 
 
   lazy val userDao: UserDao = new UserDao
 
-  def createTablesIfNotExist(): Unit = {
-    Await.result(userDao.createTablesIfNotExist(), waitTime)
-  }
-
   def initDB(): Unit = userDao.initDB()
 
   def dropDB(): Unit = userDao.dropDB()

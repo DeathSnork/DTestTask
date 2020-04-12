@@ -2,7 +2,6 @@ package DINS.TestTask.data.dao
 
 import DINS.TestTask.data.db.DataBaseSchema
 import DINS.TestTask.data.model.{Address, User, UserWithAddress}
-import slick.jdbc.meta.MTable
 import slick.sql.FixedSqlAction
 
 import scala.concurrent.duration.Duration
@@ -11,16 +10,6 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 class UserDao(implicit ex: ExecutionContext) extends DataBaseSchema {
 
   import driver.api._
-
-  def createTablesIfNotExist(): Future[List[Unit]] = {
-    val existing = db.run(MTable.getTables)
-    existing.flatMap(v => {
-      val names = v.map(mt => mt.name.name)
-      val createIfNotExist = tables.filter(table =>
-        (!names.contains(table.baseTableRow.tableName))).map(_.schema.create)
-      db.run(DBIO.sequence(createIfNotExist))
-    })
-  }
 
   def AddressSchemaCreation(): FixedSqlAction[Unit, NoStream, Effect.Schema] = addresses.schema.create
   def AddressSchemaDeletion(): FixedSqlAction[Unit, NoStream, Effect.Schema] = addresses.schema.drop
@@ -42,16 +31,8 @@ class UserDao(implicit ex: ExecutionContext) extends DataBaseSchema {
     Await.result(dropAddresses, Duration.Inf)
   }
 
-  private def addAddressAction(address: Address): DBIO[Address] = {
-    addresses returning addresses.map(_.id) into ((address, id) => address.copy(id = Some(id))) += address
-  }
-
   def updateAddressByIdAction(id: Long, address: Address): DBIO[Int] = {
     addresses.filter(_.id === id).update(address)
-  }
-
-  private def addUserAction(user: User): DBIO[User] = {
-    users returning users.map(_.id) into ((user, id) => user.copy(id = Some(id))) += user
   }
 
   def updateUserByIdAction(id: Long, user: User): DBIO[Int] = {
