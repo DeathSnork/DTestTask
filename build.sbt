@@ -31,5 +31,6 @@ lazy val root = (project in file("."))
   ),
     mainClass in (Compile, run) := Some("DINS.TestTask.Main"),
     mainClass in (assembly) := Some("DINS.TestTask.Main"),
-    assemblyJarName in assembly := "DINSTestTask.jar"
+    assemblyJarName in assembly := "DINSTestTask.jar",
+    assemblyOutputPath in assembly := file("./DINSTestTask.jar")
   )
